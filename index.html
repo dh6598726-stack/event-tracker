@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奇门遁甲 - 动态式盘渲染引擎</title>
+    <style>
+        body {
+            background-color: #121212; /* 深色护眼模式，符合严谨的工具软件规范 */
+            color: #E0E0E0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+            margin: 0;
+        }
+        .canvas-container {
+            position: relative;
+            background-color: #1E1E1E;
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            padding: 20px;
+        }
+        canvas {
+            display: block;
+        }
+        h2 {
+            letter-spacing: 2px;
+            color: #D4AF37; /* 专业法器常用的暗金色 */
+        }
+    </style>
+</head>
+<body>
+
+    <h2>太极时空矩阵渲染测试</h2>
+    
+    <div class="canvas-container">
+        <canvas id="qimenCanvas" width="600" height="600"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('qimenCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        function initEngine() {
+            // 解决高分屏模糊问题
+            const dpr = window.devicePixelRatio || 1;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.scale(dpr, dpr);
+            
+            drawEarthPlate();
+        }
+
+        function drawEarthPlate() {
+            // 绘制基础底盘 (洛书九宫)
+            ctx.clearRect(0, 0, width, height);
+            ctx.strokeStyle = 'rgba(212, 175, 55, 0.6)'; // 暗金色线条
+            ctx.lineWidth = 1.5;
+
+            // 绘制最外层天象轨道
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 280, 0, 2 * Math.PI);
+            ctx.stroke();
+
+            // 绘制内层九宫格
+            const gridSize = 140;
+            const startX = centerX - (gridSize * 1.5);
+            const startY = centerY - (gridSize * 1.5);
+
+            // 绘制矩阵网格
+            for (let i = 0; i <= 3; i++) {
+                // 垂直线
+                ctx.beginPath();
+                ctx.moveTo(startX + i * gridSize, startY);
+                ctx.lineTo(startX + i * gridSize, startY + gridSize * 3);
+                ctx.stroke();
+                // 水平线
+                ctx.beginPath();
+                ctx.moveTo(startX, startY + i * gridSize);
+                ctx.lineTo(startX + gridSize * 3, startY + i * gridSize);
+                ctx.stroke();
+            }
+
+            // 填充九宫底盘绝对坐标系（后天八卦）
+            const palaces = [
+                "巽四 (木)", "离九 (火)", "坤二 (土)",
+                "震三 (木)", "中五 (土)", "兑七 (金)",
+                "艮八 (土)", "坎一 (水)", "乾六 (金)"
+            ];
+
+            ctx.fillStyle = '#D4AF37';
+            ctx.font = 'bold 18px "Microsoft YaHei"';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            let idx = 0;
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 3; c++) {
+                    let x = startX + c * gridSize + (gridSize / 2);
+                    let y = startY + r * gridSize + (gridSize / 2);
+                    ctx.fillText(palaces[idx], x, y);
+                    idx++;
+                }
+            }
+        }
+
+        // 启动渲染引擎
+        initEngine();
+    </script>
+</body>
+</html>
