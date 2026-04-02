@@ -58,7 +58,46 @@
             
             drawEarthPlate();
         }
+// 在 script 标签中追加以下异步调用函数
+        
+        async function fetchQimenData() {
+            // 获取当下设备的系统时间，准备传给后端
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
 
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/v1/astronomy/bazi_qimen_params?year=${year}&month=${month}&day=${day}&hour=${hour}&minute=${minute}`);
+                const data = await response.json();
+                
+                // 将后端严密计算的干支数据打印在控制台进行核对
+                console.log("=== 奇门遁甲核心时空参数获取成功 ===");
+                console.log(`当前节气: ${data.solar_term}`);
+                console.log(`日干支 (日柱): ${data.day_pillar}`);
+                console.log(`时干支 (时柱): ${data.hour_pillar}`);
+                console.log("======================================");
+                
+                // 此处预留：后续将获取到的干支数据传入 Canvas 渲染引擎
+                
+            } catch (error) {
+                console.error("引擎连接失败，请确保 FastAPI 后端已在 8000 端口启动:", error);
+            }
+        }
+
+        // 修改引擎启动逻辑
+        function initEngine() {
+            // ... (保留之前的 dpr 缩放和 drawEarthPlate 代码)
+            
+            // 绘制静态底盘
+            drawEarthPlate();
+            
+            // 发送网络请求，获取实时动态参数
+            fetchQimenData(); 
+        }
+        
         function drawEarthPlate() {
             // 绘制基础底盘 (洛书九宫)
             ctx.clearRect(0, 0, width, height);
